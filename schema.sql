@@ -1,0 +1,5 @@
+create extension if not exists pgcrypto;
+create table if not exists public.products(id uuid primary key default gen_random_uuid(),name text not null,category text not null,description text not null default '',price numeric(10,2) not null check(price>=0),rating numeric(2,1) not null default 0 check(rating between 0 and 5),tags text[] not null default '{}',image text,url text,source text not null default 'Catalog',active boolean not null default true,created_at timestamptz not null default now());
+create index if not exists products_category_idx on public.products(category);
+create table if not exists public.product_sources(id uuid primary key default gen_random_uuid(),name text not null,source_type text not null,feed_url text,enabled boolean not null default false,created_at timestamptz not null default now());
+alter table public.products enable row level security;drop policy if exists "Anyone can read active products" on public.products;create policy "Anyone can read active products" on public.products for select using(active=true);
